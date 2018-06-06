@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/static/jquery-3.3.1.js"></script>
+    <style>
+        .comment-box{
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div newsid="1" class="com">内容一</div>
+    <script>
+        $(
+            function(){
+                bindCommentEvent();
+            }
+        );
+        function bindCommentEvent() {
+            $(".com").click(function () {
+                var newid = $(this).attr("newsid");
+                var _this = $(this);
+                $.ajax({
+                    url: "/comment/",
+                    type: 'GET',
+                    data: {newid: newid},
+                    dataType: "JSON",
+                    success: function (args) {
+                        console.log(args);
+                        create_tree(args, _this);
+                    }
+                })
+            })
+        }
+
+        function creatBox(children_list) {
+            var html = '';
+            $.each(children_list, function (k, v){
+                html += '<div class="comment-box"><span>' + v.content + "</span>" + creatBox(v.children) + "</div>";
+            })
+            return html;
+        }
+        
+        function create_tree(data, $this) {
+            var html = '<div class="comment-list">';
+                $.each(data, function (k, v) {
+                    html += '<div class="comment-box"><span>' + v.content + '</span>' + creatBox(v.children) + "</div>";
+                });
+            html += "</div>";
+        $this.append(html)
+        }
+    </script>
+</body>
+</html>
